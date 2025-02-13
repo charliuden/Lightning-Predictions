@@ -1,0 +1,79 @@
+---
+title: "Last Millennium Lightning Reconstrucitons"
+author: "Charlotte Uden"
+date: "2025-01-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Background
+
+### Developing a lightning prediction model from six near-surface climate reanalysis products 
+
+#### Abstract
+Atmospheric climate variables, such as Convective Available Potential Energy (CAPE), have been used to predict the occurrence of cloud-to-ground lightning. CAPE is calculated from information at different atmospheric levels, which are not always available, for example, in remote regions or in long-term historical climate reconstruction. This study aims to predict lightning flash rate from metrics that are more commonly available and compares these methods to predictions from CAPE-based models. Here, we use a Bayesian approach to develop a predictive model for lightning flash rate, parameterized using six near-surface climate products: temperature, precipitation, humidity, surface air pressure, wind, and short-wave radiation. Model performance is compared with a CAPE × precipitation model. We use six years of training data (2005 - 2010) that covers the Northeastern United States (New England states and New York), with the model trained specifically on summer months. Climate data were derived from the ERA5 climate reanalysis product, and cloud-to-ground lightning strikes were collected by the Vaisala Lightning Database. We found that a model applying the additive effects of all six climate variables is the best fit to lightning strike rate. In the absence of atmospheric climate data, this model can be used to reconstruct summer lightning flash rates from commonly available near-surface climate data. 
+
+Model (m13): Lightning strike rate follows a Gamma distribution:
+
+Lightning Strike Rate ~ Gamma(α, β)
+
+and parameters 𝛼 (shape) and 𝛽 (scale) follow a linear relationship with climate: 
+
+α = aₐ + bₐ * SWR + cₐ * T + dₐ * RH + eₐ * W + fₐ * P + gₐ * SP
+
+β = aᵦ + bᵦ * SWR + cᵦ * T + dᵦ * RH + eᵦ * W + fᵦ * P + gᵦ * SP
+
+Parameters a𝛼 and a𝛽 are intercept terms for 𝛼 and 𝛽, respectively. b-g𝛼 and b-g𝛽 represent the coefficients for the effects of climate on 𝛼 and 𝛽, respectively. Each climate variable contributes linearly and independently to 𝛼 and 𝛽. 
+
+Import table of parameter values. we are using m13.
+
+### Read in the paleoclimate data and get summer means
+data located in: /epscorfs/data/PalEON/met_regional/phase2_met_regional_v2_daily/concatenated
+
+```{r}
+
+
+```
+
+
+### Get model parameter values
+
+```{r cars}
+param_table <- read.table("/raid/cuden/data/seasonal_param_table.txt")
+
+print(param_table)
+```
+Get parameter values for m13
+
+```{r}
+
+a_alpha <- param_table[15, 5]
+b_alpha <- param_table[15, 6]
+c_alpha <- param_table[15, 7]
+d_alpha <- param_table[15, 8]
+e_alpha <- param_table[15, 9]
+f_alpha <- param_table[15, 10]
+g_alpha <- param_table[15, 11]
+
+a_beta <- param_table[15, 13]
+b_beta <- param_table[15, 14]
+c_beta <- param_table[15, 15]
+d_beta <- param_table[15, 16]
+e_beta <- param_table[15, 17]
+f_beta <- param_table[15, 18]
+g_beta <- param_table[15, 19]
+
+alpha <- a_alpha + b_alpha * df$swr + c_alpha*df$tair + d_alpha*df$rh + e_alpha*df$wind + f_alpha*df$precip + f_alpha*df$sp
+
+beta <- a_beta + b_beta * df$swr + c_beta*df$tair + d_beta*df$rh + e_beta*df$wind + f_beta*df$precip + f_beta*df$sp
+
+n <- nrow(df)
+
+simStrikes <- dgamma(n, alpha, beta)
+
+```
+
+
